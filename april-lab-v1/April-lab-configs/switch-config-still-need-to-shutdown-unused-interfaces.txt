@@ -1,0 +1,880 @@
+HQ-SW-1#show run
+*Sep  1 21:48:24.860: %SYS-5-CONFIG_I: Configured from console by admin-user on console
+Building configuration...
+
+Current configuration : 5108 bytes
+!
+! Last configuration change at 21:48:24 UTC Mon Sep 1 2025 by admin-user
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service compress-config
+!
+hostname HQ-SW-1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$uf6D$MJnYsTxdcEDIBf3Rdr.j90
+!
+username hq-admin privilege 15 secret 5 $1$n9iJ$Alb2Wrs.UIv1KHJP5tICT1
+username supportro secret 5 $1$pD4o$e/BmR61AEX/XBDByPMGuz1
+username admin privilege 15 secret 5 $1$KtM7$0yv.L5/Vmbnbncv2BsrbN.
+aaa new-model
+!
+!
+aaa group server radius RADIUS-GROUP
+ server name RADIUS-SERVER
+ server 10.0.1.125
+!
+aaa authentication login default group radius local
+aaa authorization exec default group radius local
+aaa accounting exec default start-stop group radius
+!
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain-name april-lab-company.com
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel1
+ no switchport
+ ip address 10.0.1.13 255.255.255.252
+!
+interface Port-channel2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/0
+ no switchport
+ ip address 10.0.1.6 255.255.255.252
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+!
+interface GigabitEthernet0/2
+ no switchport
+ no ip address
+ negotiation auto
+ channel-group 1 mode desirable
+!
+interface GigabitEthernet0/3
+ no switchport
+ no ip address
+ negotiation auto
+ channel-group 1 mode desirable
+!
+interface GigabitEthernet1/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ channel-group 2 mode desirable
+!
+interface GigabitEthernet1/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ channel-group 2 mode desirable
+!
+interface GigabitEthernet1/2
+ switchport access vlan 99
+ switchport mode access
+ negotiation auto
+!
+interface GigabitEthernet1/3
+ negotiation auto
+!
+interface GigabitEthernet2/0
+ shutdown
+ negotiation auto
+!
+interface GigabitEthernet2/1
+ negotiation auto
+!
+interface GigabitEthernet2/2
+ negotiation auto
+!
+interface GigabitEthernet2/3
+ negotiation auto
+!
+interface GigabitEthernet3/0
+ negotiation auto
+!
+interface GigabitEthernet3/1
+ negotiation auto
+!
+interface GigabitEthernet3/2
+ negotiation auto
+!
+interface GigabitEthernet3/3
+ negotiation auto
+!
+interface Vlan10
+ ip address 10.0.1.129 255.255.255.128
+!
+interface Vlan99
+ ip address 10.0.1.65 255.255.255.192
+!
+router ospf 1
+ router-id 10.0.1.65
+ network 10.0.1.4 0.0.0.3 area 0
+ network 10.0.1.12 0.0.0.3 area 0
+ network 10.0.1.65 0.0.0.0 area 0
+ network 10.0.1.125 0.0.0.0 area 0
+ network 10.0.1.126 0.0.0.0 area 0
+ network 10.0.1.129 0.0.0.0 area 0
+ network 10.0.1.132 0.0.0.0 area 0
+!
+ip forward-protocol nd
+!
+ip http server
+ip http secure-server
+!
+ip ssh time-out 60
+ip ssh version 2
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+!
+!
+radius server RADIUS-SERVER
+ address ipv4 10.0.1.125 auth-port 1812 acct-port 1813
+ key 7 06120A325847071E544541
+!
+!
+control-plane
+!
+banner exec ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+banner incoming ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+banner login ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+line vty 5 15
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+!
+!
+end
+
+HQ-SW-1#
+
+
+
+
+
+HQ-SW-2#show run
+Building configuration...
+
+*Sep  1 21:49:17.500: %SYS-5-CONFIG_I: Configured from console by console
+Current configuration : 4924 bytes
+!
+! Last configuration change at 21:49:17 UTC Mon Sep 1 2025
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service compress-config
+!
+hostname HQ-SW-2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$lN5F$A0u1D.C1NRarwbr8jNUPX1
+!
+username admin privilege 15 secret 5 $1$B0Ds$VWJF60fIljn2kM8vwAt2l1
+username supportro secret 5 $1$gbv.$BJah9rv.ZgIeGWaEgoVMS.
+aaa new-model
+!
+!
+aaa group server radius RADIUS-GROUP
+ server name RADIUS-SERVER
+ server 10.0.1.125
+!
+aaa authentication login default group radius local
+aaa authorization exec default group radius local
+aaa accounting exec default start-stop group radius
+!
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain-name april-lab-company.com
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel1
+ no switchport
+ ip address 10.0.1.14 255.255.255.252
+!
+interface Port-channel2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/0
+ no switchport
+ ip address 10.0.1.10 255.255.255.252
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ switchport access vlan 10
+ switchport mode access
+ switchport port-security mac-address sticky
+ negotiation auto
+!
+interface GigabitEthernet0/2
+ no switchport
+ no ip address
+ negotiation auto
+ channel-group 1 mode desirable
+!
+interface GigabitEthernet0/3
+ no switchport
+ no ip address
+ negotiation auto
+ channel-group 1 mode desirable
+!
+interface GigabitEthernet1/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ channel-group 2 mode desirable
+!
+interface GigabitEthernet1/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ negotiation auto
+ channel-group 2 mode desirable
+!
+interface GigabitEthernet1/2
+ negotiation auto
+!
+interface GigabitEthernet1/3
+ negotiation auto
+!
+interface GigabitEthernet2/0
+ negotiation auto
+!
+interface GigabitEthernet2/1
+ negotiation auto
+!
+interface GigabitEthernet2/2
+ negotiation auto
+!
+interface GigabitEthernet2/3
+ negotiation auto
+!
+interface GigabitEthernet3/0
+ negotiation auto
+!
+interface GigabitEthernet3/1
+ negotiation auto
+!
+interface GigabitEthernet3/2
+ negotiation auto
+!
+interface GigabitEthernet3/3
+ negotiation auto
+!
+interface Vlan10
+ ip address 10.0.1.130 255.255.255.128
+ ip helper-address 10.0.1.126
+!
+interface Vlan99
+ ip address 10.0.1.67 255.255.255.192
+!
+router ospf 1
+ router-id 10.0.1.67
+ network 10.0.1.8 0.0.0.3 area 0
+ network 10.0.1.12 0.0.0.3 area 0
+ network 10.0.1.67 0.0.0.0 area 0
+ network 10.0.1.130 0.0.0.0 area 0
+!
+ip forward-protocol nd
+!
+ip http server
+ip http secure-server
+!
+ip ssh time-out 60
+ip ssh version 2
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+!
+!
+radius server RADIUS-SERVER
+ address ipv4 10.0.1.125 auth-port 1812 acct-port 1813
+ key 7 14031718180D242C757A60
+!
+!
+control-plane
+!
+banner exec ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+banner incoming ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+banner login ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+line vty 5 15
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+!
+!
+end
+
+HQ-SW-2#
+
+
+
+
+
+
+
+
+
+BRANCH-1-SW#show run
+Building configuration...
+
+Current configuration : 4441 bytes
+!
+! Last configuration change at 21:24:04 UTC Mon Sep 1 2025 by admin-user
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service compress-config
+!
+hostname BRANCH-1-SW
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$3ZB/$OzU.STLxVHJOsba8Dam2n1
+!
+username branch1-admin privilege 15 secret 5 $1$Z0J4$ZXIytIKjkoxQUhcZilKMI.
+username supportro secret 5 $1$bGJo$a7M1IqcNMNLL9qwrgWqBB0
+username admin privilege 15 secret 5 $1$mGUB$/Bf0p.9y/mzxfJ58Hdqd00
+aaa new-model
+!
+!
+aaa group server radius RADIUS-GROUP
+ server name RADIUS-SERVER
+ server 10.0.1.125
+!
+aaa authentication login default group radius local
+aaa authorization exec default group radius local
+aaa accounting exec default start-stop group radius
+!
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain-name april-lab-company.com
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ switchport access vlan 10
+ switchport mode access
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ no switchport
+ ip address 10.0.2.6 255.255.255.252
+ negotiation auto
+!
+interface GigabitEthernet0/2
+ negotiation auto
+!
+interface GigabitEthernet0/3
+ negotiation auto
+!
+interface GigabitEthernet1/0
+ negotiation auto
+!
+interface GigabitEthernet1/1
+ negotiation auto
+!
+interface GigabitEthernet1/2
+ negotiation auto
+!
+interface GigabitEthernet1/3
+ negotiation auto
+!
+interface GigabitEthernet2/0
+ negotiation auto
+!
+interface GigabitEthernet2/1
+ negotiation auto
+!
+interface GigabitEthernet2/2
+ negotiation auto
+!
+interface GigabitEthernet2/3
+ negotiation auto
+!
+interface GigabitEthernet3/0
+ negotiation auto
+!
+interface GigabitEthernet3/1
+ negotiation auto
+!
+interface GigabitEthernet3/2
+ negotiation auto
+!
+interface GigabitEthernet3/3
+ negotiation auto
+!
+interface Vlan10
+ ip address 10.0.2.129 255.255.255.128
+ ip helper-address 10.0.1.126
+!
+interface Vlan99
+ ip address 10.0.2.65 255.255.255.192
+!
+router ospf 1
+ network 10.0.2.4 0.0.0.3 area 0
+ network 10.0.2.65 0.0.0.0 area 0
+ network 10.0.2.129 0.0.0.0 area 0
+!
+ip forward-protocol nd
+!
+ip http server
+ip http secure-server
+!
+ip ssh time-out 60
+ip ssh version 2
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+!
+!
+radius server RADIUS-SERVER
+ address ipv4 10.0.1.125 auth-port 1812 acct-port 1813
+ key 7 021201481F0F01261D1C5A
+!
+!
+control-plane
+!
+banner exec ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+banner incoming ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+banner login ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+line vty 5 15
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+!
+!
+end
+
+BRANCH-1-SW#
+
+
+
+
+
+
+BRANCH-2-SW#show run
+Building configuration...
+
+Current configuration : 4441 bytes
+!
+! Last configuration change at 21:19:38 UTC Mon Sep 1 2025 by admin-user
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service compress-config
+!
+hostname BRANCH-2-SW
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 5 $1$umK3$eMCI4JVDIiGW4yChBnn3.0
+!
+username branch2-admin privilege 15 secret 5 $1$ItnT$.V9nK3KCxgKoR8auYgBDa.
+username supportro secret 5 $1$m6pO$4MArOL3Znn6zilvmL4xGo.
+username admin privilege 15 secret 5 $1$qiik$/kD0/456NQUgVNTs3eXyw1
+aaa new-model
+!
+!
+aaa group server radius RADIUS-GROUP
+ server name RADIUS-SERVER
+ server 10.0.1.125
+!
+aaa authentication login default group radius local
+aaa authorization exec default group radius local
+aaa accounting exec default start-stop group radius
+!
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain-name april-lab-company.com
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ no switchport
+ ip address 10.0.3.6 255.255.255.252
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ switchport access vlan 10
+ switchport mode access
+ negotiation auto
+!
+interface GigabitEthernet0/2
+ negotiation auto
+!
+interface GigabitEthernet0/3
+ negotiation auto
+!
+interface GigabitEthernet1/0
+ negotiation auto
+!
+interface GigabitEthernet1/1
+ negotiation auto
+!
+interface GigabitEthernet1/2
+ negotiation auto
+!
+interface GigabitEthernet1/3
+ negotiation auto
+!
+interface GigabitEthernet2/0
+ negotiation auto
+!
+interface GigabitEthernet2/1
+ negotiation auto
+!
+interface GigabitEthernet2/2
+ negotiation auto
+!
+interface GigabitEthernet2/3
+ negotiation auto
+!
+interface GigabitEthernet3/0
+ negotiation auto
+!
+interface GigabitEthernet3/1
+ negotiation auto
+!
+interface GigabitEthernet3/2
+ negotiation auto
+!
+interface GigabitEthernet3/3
+ negotiation auto
+!
+interface Vlan10
+ ip address 10.0.3.129 255.255.255.128
+ ip helper-address 10.0.1.126
+!
+interface Vlan99
+ ip address 10.0.3.65 255.255.255.192
+!
+router ospf 1
+ network 10.0.3.4 0.0.0.3 area 0
+ network 10.0.3.65 0.0.0.0 area 0
+ network 10.0.3.129 0.0.0.0 area 0
+!
+ip forward-protocol nd
+!
+ip http server
+ip http secure-server
+!
+ip ssh time-out 60
+ip ssh version 2
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+!
+!
+radius server RADIUS-SERVER
+ address ipv4 10.0.1.125 auth-port 1812 acct-port 1813
+ key 7 03105E1812062F4B1F5B4A
+!
+!
+control-plane
+!
+banner exec ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+banner incoming ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+banner login ^C
+IOSv - Cisco Systems Confidential -
+
+Supplemental End User License Restrictions
+
+This IOSv software is provided AS-IS without warranty of any kind. Under no circumstances may this software be used separate from the Cisco Modeling Labs Software that this software was provided with, or deployed or used as part of a production environment.
+
+By using the software, you agree to abide by the terms and conditions of the Cisco End User License Agreement at http://www.cisco.com/go/eula. Unauthorized use or distribution of this software is expressly prohibited.
+^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+line vty 5 15
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+!
+!
+end
+
+BRANCH-2-SW#

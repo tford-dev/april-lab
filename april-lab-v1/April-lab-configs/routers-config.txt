@@ -1,0 +1,1040 @@
+HQ#show run
+Building configuration...
+
+
+Current configuration : 4698 bytes
+!
+! Last configuration change at 22:22:43 UTC Mon Sep 1 2025 by admin
+!
+version 15.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname HQ
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 9 $9$qJ3oDHapyjopWP$aSUL1eoVJx9uHv4PFFV87gO87URGSMJEBnGzL2EPVOE
+!
+aaa new-model
+!
+!
+aaa group server radius RADIUS-GROUP
+ server name RADIUS-SERVER
+ server 10.0.1.125
+!
+aaa authentication login default group radius local
+aaa authorization exec default group radius local
+aaa accounting exec default start-stop group radius
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain name april-lab-company.com
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+username admin privilege 15 secret 9 $9$EFmhlQPUopiS8P$0T4wh/d6/Xfn6ZKJVCkGHHEFlxotteHLNIT1vnZ/Uq2
+username supportro secret 9 $9$EfA7KgdVjkEy/9$E9H/lV0eCMQT140t/p31dWPUObYw/PGsWIrNDpGiVJo
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.0.1.66 255.255.255.255
+!
+interface Loopback1
+ ip address 5.5.5.5 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description To SW-1
+ ip address 10.0.1.5 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ description To SW-2
+ ip address 10.0.1.9 255.255.255.252
+ ip ospf cost 100
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ description To FW
+ ip address 10.0.1.2 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/3
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router ospf 1
+ router-id 10.0.1.66
+ redistribute bgp 50001 subnets
+ network 10.0.1.0 0.0.0.3 area 0
+ network 10.0.1.4 0.0.0.3 area 0
+ network 10.0.1.8 0.0.0.3 area 0
+ network 10.0.1.66 0.0.0.0 area 0
+ default-information originate always
+!
+router bgp 50001
+ bgp router-id 5.5.5.5
+ bgp log-neighbor-changes
+ neighbor 10.0.1.1 remote-as 50001
+ !
+ address-family ipv4
+  network 5.5.5.5 mask 255.255.255.255
+  redistribute ospf 1 route-map HQ-ROUTES
+  neighbor 10.0.1.1 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 10.0.1.1
+ip route 10.0.1.0 255.255.255.0 Null0
+ip ssh time-out 60
+ip ssh version 2
+!
+!
+ip prefix-list HQ-SUMMARY seq 5 permit 10.0.1.0/24
+ipv6 ioam timestamp
+!
+route-map HQ-ROUTES permit 10
+ match ip address prefix-list HQ-SUMMARY
+!
+!
+!
+!
+radius server RADIUS-SERVER
+ address ipv4 10.0.1.125 auth-port 1812 acct-port 1813
+ key 7 03105E1812062F4B1F5B4A
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+line vty 5 15
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+!
+no scheduler allocate
+!
+end
+
+HQ#
+
+
+
+
+
+BRANCH-1#show run
+Building configuration...
+
+
+Current configuration : 4762 bytes
+!
+! Last configuration change at 21:32:39 UTC Mon Sep 1 2025 by admin-user
+!
+version 15.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname BRANCH-1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 9 $9$vUvjBve6wDATiP$iOxxA3JTP0undm/EzGqcxZTWIIXvMUQWfLVGOmzFzgY
+!
+aaa new-model
+!
+!
+aaa group server radius RADIUS-GROUP
+ server name RADIUS-SERVER
+ server 10.0.1.125
+!
+aaa authentication login default group radius local
+aaa authorization exec default group radius local
+aaa accounting exec default start-stop group radius
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain name april-lab-company.com
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+username branch1-admin privilege 15 secret 9 $9$6UJyVNkBpknl8f$EFRnawMoJUI/lKjBQ6C6X7sccutgnDZ.j.1yShMyP2E
+username supportro secret 9 $9$Sy53JWCZEIAfVP$4hlpQh0vf5t.9dcHBhc.6zDWL5hnBbqKEcyktSy31RE
+username admin privilege 15 secret 9 $9$O1KelQFXqY9XtP$zuH2MLprkPFoYNX.F3BCZ7aTOi7HnwhkA9oXCd6Blyk
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.0.2.66 255.255.255.255
+!
+interface Loopback1
+ ip address 3.3.3.3 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description To Branch 1 Edge
+ ip address 10.0.2.2 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ description To SW1
+ ip address 10.0.2.5 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/3
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router ospf 1
+ router-id 10.0.2.66
+ redistribute bgp 50002 subnets
+ network 10.0.2.0 0.0.0.3 area 0
+ network 10.0.2.4 0.0.0.3 area 0
+ network 10.0.2.66 0.0.0.0 area 0
+ default-information originate always
+!
+router bgp 50002
+ bgp router-id 3.3.3.3
+ bgp log-neighbor-changes
+ neighbor 10.0.2.1 remote-as 50002
+ !
+ address-family ipv4
+  network 3.3.3.3 mask 255.255.255.255
+  redistribute ospf 1 route-map BRANCH-1-ROUTES
+  neighbor 10.0.2.1 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 10.0.2.1
+ip route 10.0.2.0 255.255.255.0 Null0
+ip ssh time-out 60
+ip ssh version 2
+!
+!
+ip prefix-list FILTER-SUMMARY seq 5 permit 10.0.2.0/24
+ipv6 ioam timestamp
+!
+route-map BRANCH-1-ROUTES permit 10
+ match ip address prefix-list FILTER-SUMMARY
+!
+!
+!
+!
+radius server RADIUS-SERVER
+ address ipv4 10.0.1.125 auth-port 1812 acct-port 1813
+ key 7 044F0E151B284249584B56
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+line vty 5 15
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+!
+no scheduler allocate
+!
+end
+
+BRANCH-1#
+
+
+
+
+
+
+BRANCH-2#show run
+Building configuration...
+
+
+Current configuration : 4762 bytes
+!
+! Last configuration change at 21:22:55 UTC Mon Sep 1 2025 by admin-user
+!
+version 15.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname BRANCH-2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 9 $9$qf6CCy28L1uZsv$PbIwBrp.5UA4XdTcCEcxTFyczWhIEoMxXQuEyNIk7sk
+!
+aaa new-model
+!
+!
+aaa group server radius RADIUS-GROUP
+ server name RADIUS-SERVER
+ server 10.0.1.125
+!
+aaa authentication login default group radius local
+aaa authorization exec default group radius local
+aaa accounting exec default start-stop group radius
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip domain name april-lab-company.com
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+username branch2-admin privilege 15 secret 9 $9$MWcHBdVurJXhSP$lj6Kfwu1Gto6gf7UB3ORSVuztDZNYdfvzx9ezwp3VNE
+username supportro secret 9 $9$MwgZ7.3fCWjHj9$s3cl0JjUGWAJYjV44HYPqcmea3NfuUOp8T2HvZVfUT.
+username admin privilege 15 secret 9 $9$lxnIADEmdcY1ff$NLC605gWwhp/XyZqGCCt5s3F89z2t.mQMEVX7aNAQLs
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.0.3.66 255.255.255.255
+!
+interface Loopback1
+ ip address 4.4.4.4 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description To Branch 2 Edge
+ ip address 10.0.3.2 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ description To SW1
+ ip address 10.0.3.5 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/3
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router ospf 1
+ router-id 10.0.3.66
+ redistribute bgp 50003 subnets
+ network 10.0.3.0 0.0.0.3 area 0
+ network 10.0.3.4 0.0.0.3 area 0
+ network 10.0.3.66 0.0.0.0 area 0
+ default-information originate always
+!
+router bgp 50003
+ bgp router-id 4.4.4.4
+ bgp log-neighbor-changes
+ neighbor 10.0.3.1 remote-as 50003
+ !
+ address-family ipv4
+  network 4.4.4.4 mask 255.255.255.255
+  redistribute ospf 1 route-map BRANCH-2-ROUTES
+  neighbor 10.0.3.1 activate
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip route 0.0.0.0 0.0.0.0 10.0.3.1
+ip route 10.0.3.0 255.255.255.0 Null0
+ip ssh time-out 60
+ip ssh version 2
+!
+!
+ip prefix-list FILTER-SUMMARY seq 5 permit 10.0.3.0/24
+ipv6 ioam timestamp
+!
+route-map BRANCH-2-ROUTES permit 10
+ match ip address prefix-list FILTER-SUMMARY
+!
+!
+!
+!
+radius server RADIUS-SERVER
+ address ipv4 10.0.1.125 auth-port 1812 acct-port 1813
+ key 7 00101615105205015E731F
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+line vty 5 15
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+!
+no scheduler allocate
+!
+end
+
+BRANCH-2#
+
+
+
+
+
+TERRY-ISP#show run
+Building configuration...
+
+Current configuration : 4180 bytes
+!
+! Last configuration change at 18:34:56 UTC Mon Sep 1 2025
+!
+version 15.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname TERRY-ISP
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 1.1.1.1 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description To HQ Edge
+ ip address 198.51.100.225 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ description To Branch 2 Edge
+ ip address 192.0.2.145 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ description To Branch 1 Edge
+ ip address 203.0.113.49 255.255.255.252
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/3
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router bgp 50000
+ bgp router-id 1.1.1.1
+ bgp log-neighbor-changes
+ neighbor 192.0.2.146 remote-as 50003
+ neighbor 192.0.2.146 description Branch 2 Edge
+ neighbor 198.51.100.226 remote-as 50001
+ neighbor 198.51.100.226 description HQ
+ neighbor 203.0.113.50 remote-as 50002
+ neighbor 203.0.113.50 description Branch 1 Edge
+ !
+ address-family ipv4
+  network 1.1.1.1 mask 255.255.255.255
+  neighbor 192.0.2.146 activate
+  neighbor 192.0.2.146 route-map FILTER-PRIVATE in
+  neighbor 192.0.2.146 route-map FILTER-PRIVATE out
+  neighbor 198.51.100.226 activate
+  neighbor 198.51.100.226 route-map FILTER-PRIVATE in
+  neighbor 198.51.100.226 route-map FILTER-PRIVATE out
+  neighbor 203.0.113.50 activate
+  neighbor 203.0.113.50 route-map FILTER-PRIVATE in
+  neighbor 203.0.113.50 route-map FILTER-PRIVATE out
+ exit-address-family
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list BLOCK-PRIVATE seq 5 deny 10.0.0.0/8 le 32
+ip prefix-list BLOCK-PRIVATE seq 20 permit 0.0.0.0/0 le 32
+ipv6 ioam timestamp
+!
+route-map FILTER-PRIVATE deny 10
+ match ip address prefix-list BLOCK-PRIVATE
+!
+route-map FILTER-PRIVATE permit 20
+!
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ login
+ transport input none
+!
+no scheduler allocate
+!
+end
+
+TERRY-ISP#
+
+
+
+
+
+
+MANAGEMENT#show run
+Building configuration...
+
+
+Current configuration : 5261 bytes
+!
+! Last configuration change at 22:45:07 UTC Mon Sep 1 2025
+!
+version 15.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname MANAGEMENT
+!
+boot-start-marker
+boot-end-marker
+!
+!
+enable secret 9 $9$VNwXCFGabCoY7v$VdlkUrYsWVkDwzrPL.n1wcWjhGjsiVJPwVc/ABrRzs6
+!
+aaa new-model
+!
+!
+aaa group server radius RADIUS-GROUP
+ server name RADIUS-SERVER
+ server 10.0.1.125
+!
+aaa authentication login default group radius local
+aaa authorization exec default group radius local
+aaa accounting exec default start-stop group radius
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+ip dhcp excluded-address 10.0.1.129 10.0.1.139
+ip dhcp excluded-address 10.0.2.129 10.0.2.139
+ip dhcp excluded-address 10.0.3.129 10.0.3.139
+!
+ip dhcp pool PC-VLAN-HQ
+ network 10.0.1.128 255.255.255.128
+ default-router 10.0.1.129
+ dns-server 10.0.1.126
+ domain-name april-lab-company.com
+!
+ip dhcp pool PC-VLAN-BRANCH-1
+ network 10.0.2.128 255.255.255.128
+ default-router 10.0.2.129
+ dns-server 10.0.1.126
+ domain-name april-lab-company.com
+!
+ip dhcp pool PC-VLAN-BRANCH-2
+ network 10.0.3.128 255.255.255.128
+ default-router 10.0.3.129
+ dns-server 10.0.1.126
+ domain-name april-lab-company.com
+!
+!
+!
+ip domain name april-lab-company.com
+ip host hq-core.april-lab-company.com 10.0.1.66
+ip host hq-dist-sw1.april-lab-company.com 10.0.1.65 10.0.1.129
+ip host hq-dist-sw2.april-lab-company.com 10.0.1.67 10.0.1.130
+ip host hq-edge-fw.april-lab-company.com 10.0.1.1
+ip host branch-1-core.april-lab-company.com 10.0.2.66
+ip host branch-1-dist-sw1.april-lab-company.com 10.0.2.65 10.0.2.129
+ip host branch-1-edge-fw.april-lab-company.com 10.0.2.1
+ip host branch-2-core.april-lab-company.com 10.0.3.66
+ip host branch-2-dist-sw1.april-lab-company.com 10.0.3.65 10.0.3.129
+ip host branch-2-edge-fw.april-lab-company.com 10.0.3.1
+ip host RADIUS.april-lab-company.com 10.0.1.125
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+username admin privilege 15 secret 9 $9$1Ozbb4o6BgwgQv$0Uwss1U78kBYhUl0oQqtB.wh.HtH6AvUgnPk8Vu.h7U
+username supportro secret 9 $9$giW2GYP2JWEZm9$1wTnqIbiP8wbeo/iWZ/OP4zj6N495Zf.9Und2pgwsyw
+!
+redundancy
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ description Management Port
+ no ip address
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/0.10
+ encapsulation dot1Q 10
+ ip address 10.0.1.132 255.255.255.128
+!
+interface GigabitEthernet0/0.99
+ encapsulation dot1Q 99
+ ip address 10.0.1.126 255.255.255.192
+!
+interface GigabitEthernet0/1
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/3
+ no ip address
+ shutdown
+ duplex auto
+ speed auto
+ media-type rj45
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+ip dns server
+ip route 0.0.0.0 0.0.0.0 10.0.1.129
+ip ssh time-out 60
+ip ssh version 2
+!
+ipv6 ioam timestamp
+!
+!
+!
+!
+radius server RADIUS-SERVER
+ address ipv4 10.0.1.125 auth-port 1812 acct-port 1813
+ key 7 051F031C3545400E485744
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+line vty 5 15
+ exec-timeout 30 0
+ logging synchronous
+ transport input ssh
+!
+no scheduler allocate
+!
+end
+
+MANAGEMENT#
